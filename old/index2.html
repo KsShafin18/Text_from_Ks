@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>A Massage</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: #f8edc9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Georgia, serif;
+}
+
+
+.notebook {
+    width: 100%;
+    max-width: 650px;
+    min-height: 100vh;
+    background: #fff9df;
+    position: relative;
+    padding: 55px 35px 40px 65px;
+    box-shadow: 0 0 35px rgba(110, 85, 40, 0.12);
+    overflow: hidden;
+}
+
+
+.notebook::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 43px;
+    height: 100%;
+    width: 1px;
+    background: #e9a5a0;
+}
+
+
+.notebook::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 34px,
+        #eadfbf 35px
+    );
+    pointer-events: none;
+}
+
+
+.content {
+    position: relative;
+    z-index: 2;
+}
+
+.date {
+    font-size: 13px;
+    color: #b49a61;
+    margin-bottom: 25px;
+    font-family: Arial, sans-serif;
+    letter-spacing: 1px;
+}
+
+.title {
+    color: #a88b4f;
+    font-size: 27px;
+    font-style: italic;
+    margin-bottom: 30px;
+}
+
+.letter {
+    font-size: 16px;
+    line-height: 35px;
+    color: #554b37;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    min-height: 200px;
+}
+
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 17px;
+    background: #b49a61;
+    margin-left: 2px;
+    animation: blink 0.7s infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+
+.footer {
+    margin-top: 40px;
+    text-align: right;
+    color: #b49a61;
+    font-size: 20px;
+}
+
+@media (max-width: 600px) {
+    .notebook {
+        width: 100%;
+        min-height: 100dvh;
+        padding: 45px 22px 30px 55px;
+        box-shadow: none;
+    }
+
+    .notebook::before {
+        left: 37px;
+    }
+
+    .title {
+        font-size: 23px;
+    }
+
+    .letter {
+        font-size: 14px;
+        line-height: 35px;
+    }
+
+    .date {
+        font-size: 11px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="notebook">
+
+    <div class="content">
+
+        <div class="date">
+            
+        </div>
+
+        <h1 class="title">
+           
+        </h1>
+
+        <p class="letter" id="letter"></p><span class="cursor" id="cursor"></span>
+
+        <div class="footer">
+           
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+
+
+const message = `
+dekh ekhon ja bolar chilo ami oitae bole disi,
+ekhon full context eirokom bujhanor moto kisue nai,
+ar toke ki bujhabo tui janos e shob, ar je eto kisu dekheo na bujhe
+tare ar bujhanor kisue nai.eita ekta very obvious thing, ar bad de ekhon eishob bisoye
+focus on your current things.
+;)
+ 
+`;
+
+
+let index = 0;
+
+function typeWriter() {
+
+    if (index < message.length) {
+
+        document.getElementById("letter").textContent +=
+            message.charAt(index);
+
+        index++;
+
+        setTimeout(typeWriter, 95);
+
+    } else {
+
+        document.getElementById("cursor").style.display = "none";
+
+    }
+}
+
+
+window.addEventListener("load", () => {
+    setTimeout(typeWriter, 1500);
+});
+
+</script>
+
+</body>
+</html>
