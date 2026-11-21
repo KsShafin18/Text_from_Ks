@@ -1,6 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/textlikha", "destination": "/index.html" },
-    { "source": "/text", "destination": "/index.html" }
-  ]
-}
