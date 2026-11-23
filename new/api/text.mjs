@@ -1,4 +1,3 @@
-import { timingSafeEqual } from "node:crypto";
 import { get, put } from "@vercel/blob";
 
 const textPath = "text/current.txt";
@@ -9,12 +8,6 @@ function jsonResponse(body, status = 200) {
         status,
         headers: { "Cache-Control": "no-store" }
     });
-}
-
-function passwordMatches(password, expectedPassword) {
-    const actual = Buffer.from(password);
-    const expected = Buffer.from(expectedPassword);
-    return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 
 export default {
@@ -47,11 +40,6 @@ export default {
             return jsonResponse({ error: "Method not allowed." }, 405);
         }
 
-        const expectedPassword = process.env.SET_TEXT_PASSWORD;
-        if (!expectedPassword) {
-            return jsonResponse({ error: "Set the SET_TEXT_PASSWORD environment variable." }, 503);
-        }
-
         let body;
         try {
             body = await request.json();
@@ -61,10 +49,6 @@ export default {
 
         if (!body || typeof body !== "object" || Array.isArray(body)) {
             return jsonResponse({ error: "Invalid request." }, 400);
-        }
-
-        if (typeof body.password !== "string" || !passwordMatches(body.password, expectedPassword)) {
-            return jsonResponse({ error: "Incorrect password." }, 401);
         }
 
         if (typeof body.text !== "string") {
