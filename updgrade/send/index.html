@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send korlam</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #f2f4f7;
+      font-family: Arial, sans-serif;
+    }
+
+    main {
+      width: min(420px, calc(100% - 32px));
+      padding: 28px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 22px;
+      border: 0;
+      border-radius: 6px;
+      background: #222;
+      color: white;
+      cursor: pointer;
+    }
+
+    #success-message {
+      margin-top: 18px;
+    }
+
+    #success-message h2 {
+      margin: 0 0 8px;
+      color: green;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <label for="text-input">Enter your text:</label>
+    <input id="text-input" type="text" autocomplete="off">
+    <button id="send-button" type="button">Send</button>
+
+    <div id="success-message" hidden>
+      <h2>Text successfully sent</h2>
+      <a href="/text/">Click here to view</a>
+    </div>
+  </main>
+
+  <script>
+    const input = document.getElementById("text-input");
+    const button = document.getElementById("send-button");
+    const successMessage = document.getElementById("success-message");
+
+    function sendText() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      localStorage.setItem("textFromKsShafin", text);
+      successMessage.hidden = false;
+    }
+
+    button.addEventListener("click", sendText);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") sendText();
+    });
+  </script>
+</body>
+</html>
