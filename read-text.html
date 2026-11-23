@@ -14,12 +14,21 @@
         try {
             const response = await fetch("/api/text", { cache: "no-store" });
             if (!response.ok) {
-                throw new Error("Could not load text.");
+                let message = "Could not load text.";
+                try {
+                    const result = await response.json();
+                    if (typeof result.error === "string") {
+                        message = result.error;
+                    }
+                } catch (error) {
+                    console.error("Could not read the text API error.", error);
+                }
+                throw new Error(message);
             }
             savedTextElement.textContent = await response.text();
         } catch (error) {
             console.error("Could not load text.", error);
-            savedTextElement.textContent = "Could not load text.";
+            savedTextElement.textContent = error.message || "Could not load text.";
         }
     </script>
 </body>

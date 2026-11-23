@@ -2,6 +2,17 @@ import { get, put } from "@vercel/blob";
 
 const textPath = "text/current.txt";
 const maxTextLength = 100_000;
+const storageSetupError =
+    "Vercel Blob is not connected. In your Vercel project, open Storage, connect a Blob store, then redeploy.";
+const storageAccessError =
+    "Could not access Vercel Blob. Confirm the Blob store is connected to this project for the Production environment, then redeploy.";
+
+function hasBlobCredentials() {
+    return Boolean(
+        process.env.BLOB_READ_WRITE_TOKEN ||
+        (process.env.VERCEL_OIDC_TOKEN && process.env.BLOB_STORE_ID)
+    );
+}
 
 function jsonResponse(body, status = 200) {
     return Response.json(body, {
@@ -13,10 +24,20 @@ function jsonResponse(body, status = 200) {
 export default {
     async fetch(request) {
         if (request.method === "GET") {
+            if (!hasBlobCredentials()) {
+                return jsonResponse({ error: storageSetupError }, 503);
+            }
+
             try {
                 const blob = await get(textPath, { access: "private", useCache: false });
                 if (!blob || blob.statusCode === 404) {
-                    return jsonResponse({ text: "" });
+                    return new Response("", {
+                        headers: {
+                            "Content-Type": "text/plain; charset=utf-8",
+                            "Cache-Control": "no-store",
+                            "X-Content-Type-Options": "nosniff"
+                        }
+                    });
                 }
 
                 if (blob.statusCode !== 200 || !blob.stream) {
@@ -32,12 +53,16 @@ export default {
                 });
             } catch (error) {
                 console.error("Could not read the text from Vercel Blob.", error);
-                return jsonResponse({ error: "Could not load text." }, 500);
+                return jsonResponse({ error: storageAccessError }, 503);
             }
         }
 
         if (request.method !== "POST") {
             return jsonResponse({ error: "Method not allowed." }, 405);
+        }
+
+        if (!hasBlobCredentials()) {
+            return jsonResponse({ error: storageSetupError }, 503);
         }
 
         let body;
@@ -68,7 +93,7 @@ export default {
             return jsonResponse({ success: true });
         } catch (error) {
             console.error("Could not save the text to Vercel Blob.", error);
-            return jsonResponse({ error: "Could not save text. Check the Vercel Blob setup." }, 500);
+            return jsonResponse({ error: storageAccessError }, 503);
         }
     }
 };
