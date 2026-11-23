@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Text - Text From Ks Shafin</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: #f3f6fb;
+            color: #172033;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            width: min(100%, 560px);
+            padding: 32px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 12px 35px #18233a18;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 190px;
+            margin: 8px 0 16px;
+            padding: 14px;
+            border: 1px solid #cbd3df;
+            border-radius: 8px;
+            font: inherit;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: 2px solid #2864dc;
+            border-color: transparent;
+        }
+
+        input {
+            width: 100%;
+            margin: 8px 0 16px;
+            padding: 12px;
+            border: 1px solid #cbd3df;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        #share-url {
+            margin: 8px 0;
+        }
+
+        #share-area[hidden] {
+            display: none;
+        }
+
+        button,
+        a {
+            display: inline-block;
+            padding: 12px 20px;
+            border: 0;
+            border-radius: 8px;
+            background: #2864dc;
+            color: white;
+            font: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button:hover,
+        a:hover {
+            background: #1d4fb8;
+        }
+
+        #status {
+            min-height: 24px;
+            margin: 18px 0 0;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            background: #586579;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Set Text</h1>
+        <form id="text-form">
+            <label for="text-input">Write your text:</label>
+            <textarea id="text-input" placeholder="Type your text here..."></textarea>
+            <label for="set-password">Set password (same one configured on Vercel):</label>
+            <input id="set-password" type="password" autocomplete="current-password" required>
+            <button type="submit">Set</button>
+        </form>
+        <h3 id="status" role="status" aria-live="polite"></h3>
+        <div id="share-area" hidden>
+            <label for="share-url">Read link:</label>
+            <input id="share-url" type="url" readonly>
+            <button id="copy-link" type="button">Copy link</button>
+        </div>
+        <a class="back-link" href="index.html">Home</a>
+    </main>
+
+    <script type="module">
+        const textInput = document.getElementById("text-input");
+        const status = document.getElementById("status");
+        const shareArea = document.getElementById("share-area");
+        const shareUrlInput = document.getElementById("share-url");
+        const setPassword = document.getElementById("set-password");
+
+        document.getElementById("text-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            status.textContent = "Saving...";
+            status.style.color = "#172033";
+            shareArea.hidden = true;
+
+            try {
+                const response = await fetch("/api/text", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: textInput.value,
+                        password: setPassword.value
+                    })
+                });
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || "Could not save text.");
+                }
+
+                shareUrlInput.value = new URL("read-text.html", window.location.href).href;
+                shareArea.hidden = false;
+                status.textContent = "text set successful";
+                status.style.color = "green";
+            } catch (error) {
+                console.error("Could not save text.", error);
+                status.textContent = error.message || "Could not save text.";
+                status.style.color = "red";
+            }
+        });
+
+        document.getElementById("copy-link").addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(shareUrlInput.value);
+                status.textContent = "Link copied";
+                status.style.color = "green";
+            } catch (error) {
+                console.error("Could not copy the share link.", error);
+                status.textContent = "Select and copy the link above.";
+                status.style.color = "red";
+                shareUrlInput.select();
+            }
+        });
+    </script>
+</body>
+</html>
